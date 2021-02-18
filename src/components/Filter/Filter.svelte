@@ -1,19 +1,24 @@
 <script lang="ts">
   const validFilters = ["market", "name", "style"] as const;
+  /**
+   * "An array has a numeric index signature, as it’s indexed by numbers (0, 1, 2, …), d d
+   * so we use typeof animals[number] to get a union type of all items in our array: 
+   * 'cat' | 'dog' | 'mouse'."
+   * https://steveholgado.com/typescript-types-from-arrays/
+   */
   type FilterMode = typeof validFilters[number];
-  export let mode: FilterMode;
-  export let data;
+  export let mode: FilterMode, data;
+  $: data && data.then(res => console.log(res));
 </script>
 
 <article class="filters">
-    <div class="filter-picker">
-        <label class="large-label" for="filter-select">View galleries...</label>
-        <select name="modes" id="filter-select">
-            {#each validFilters as filter }
-              <option value="{ filter }">... by { filter }</option>
-            {/each}
-        </select>
-    </div>
+    <!-- {#await data}
+      <h1 style="color: red">No data!</h1>
+    {:then galleryData}
+      {@debug galleryData}
+    {:catch error}
+      <h1 style="color: red">Uh oh: {@debug error}</h1>
+    {/await} -->
 </article>
 
 <style type="scss">
