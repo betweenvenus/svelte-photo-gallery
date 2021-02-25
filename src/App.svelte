@@ -1,43 +1,58 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import Filter from './components/Filter/Filter.svelte';
+  import { FilterMode, fetchData } from "./util";
+  import FilterContainer from "./components/Filter/FilterContainer.svelte";
+  import Gallery from "./components/Gallery/Gallery.svelte";
+  import { urlFragment } from "./stores";
+  import { onMount } from "svelte";
+  // import Filter from "./components/Filter/Filter.svelte";
+  // import Gallery from "./components/Gallery/Gallery.svelte";
 
-	const baseURL = "https://innovativefitness.ahn2k5uj-liquidwebsites.com";
-	const endpoint = "/wp-json/wp/v2/galleries";
+  let mode: FilterMode;
+  const modes = Object.values(FilterMode).map((el) => el.toLowerCase());
 
-  const includedFields: string[] = ['title', 'photos', 'meta=featured', '_links'];
-  const queryParams: any = {
-    "_fields": includedFields.join(),
-    "_embed": "",
-    "_embedded": ""
-  }
-  const query = new URLSearchParams(queryParams);
+  let markets, galleries;
 
-  const fetchGalleries = async () => {
-    const res = await Promise.all([
-      fetch(`${baseURL}${endpoint}?${query.toString()}`),
-      fetch(`https://innovativefitness.ahn2k5uj-liquidwebsites.com/wp-json/wp/v2/market?_fields=name&hide_empty=false&per_page=100`)
-    ]);
-    const data = await res.json();
-    if (res.ok) {
-      return data;
-    }
-    else {
-      throw new Error(data);
-    }
-  }
+  const baseURL = "https://innovativefitness.ahn2k5uj-liquidwebsites.com";
+  const galleryQuery = new URLSearchParams({
+    _fields: ["title", "photos", "meta=featured", "_links"].join(),
+    _embed: "1",
+    _embedded: "1",
+  });
+  const marketQuery = new URLSearchParams({
+    _fields: "name",
+    hide_empty: "false",
+    per_page: "100",
+  });
+  const galleryEndpoint = `${baseURL}/wp-json/wp/v2/galleries?${galleryQuery.toString()}`;
+  const marketEndpoint = `${baseURL}/wp-json/wp/v2/market?${marketQuery.toString()}`;
 
-  const data = fetchGalleries();
+  (async () =>
+    ([galleries, galleries] = await fetchData([
+      galleryEndpoint,
+      marketEndpoint,
+    ])))();
 
+  const setURLFragment = (e: HashChangeEvent) =>
+    urlFragment.set(new URL(e.newURL).hash);
 </script>
 
+<!-- Sets the urlFragment store value whenever onhashchange is fired -->
+<svelte:window on:hashchange={setURLFragment} />
+
 <main>
-	<Filter mode="market" {data} />
+  <FilterContainer />
+  <Gallery />
 </main>
 
 <style type="scss">
-	main {
-		font-family: 'Roboto';
-		font-size: 18px;
-	}
+  :global(:root) {
+    --purple: #5b2963;
+    --gray: #eaeaea;
+  }
+
+  main {
+    font-family: "Roboto";
+    font-size: 18px;
+    padding: 2.5rem;
+  }
 </style>
