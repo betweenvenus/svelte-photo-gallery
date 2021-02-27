@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FilterMode, fetchData } from "./util";
+  import { FilterMode, fetchData, sortByKey } from "./util";
   import FilterContainer from "./components/Filter/FilterContainer.svelte";
   import Gallery from "./components/Gallery/Gallery.svelte";
   import { urlFragment } from "./stores";
@@ -14,7 +14,7 @@
 
   const baseURL = "https://innovativefitness.ahn2k5uj-liquidwebsites.com";
   const galleryQuery = new URLSearchParams({
-    _fields: ["title", "photos", "meta=featured", "_links"].join(),
+    _fields: ["title", "gallery_title", "photos", "meta=featured", "_links"].join(),
     _embed: "1",
     _embedded: "1",
   });
@@ -27,13 +27,17 @@
   const marketEndpoint = `${baseURL}/wp-json/wp/v2/market?${marketQuery.toString()}`;
 
   (async () =>
-    ([galleries, galleries] = await fetchData([
+    ([galleries, markets] = await fetchData([
       galleryEndpoint,
       marketEndpoint,
     ])))();
 
   const setURLFragment = (e: HashChangeEvent) =>
     urlFragment.set(new URL(e.newURL).hash);
+		let sorted;
+		$: galleries && (sorted = sortByKey(galleries, "gallery_title"));
+		// $: console.log(galleries);
+		$: console.log(sorted);
 </script>
 
 <!-- Sets the urlFragment store value whenever onhashchange is fired -->
