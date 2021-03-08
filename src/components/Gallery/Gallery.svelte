@@ -1,20 +1,13 @@
 <script lang="ts">
   import GallerySingle from "./GallerySingle.svelte";
-  export let galleries = undefined;
+  export let galleries: { id: number, title: string, photos: { id: number, title: string, photos: string[] } }= undefined;
   let dummyImages: string[] = [];
   for (let i = 0; i < 8; i++) {
     dummyImages.push(
       `https://picsum.photos/300/300?random=${Math.ceil(Math.random() * 10)}`
     );
   }
-  // const dummyImages = [
-  //   "https://picsum.photos/300/300",
-  //   "https://picsum.photos/200/300",
-  //   "https://picsum.photos/200/300",
-  //   "https://picsum.photos/200/300",
-  //   "https://picsum.photos/200/300",
-  //   "https://picsum.photos/200/300",
-  // ];
+
   galleries = [
     "This is a post",
     "This is another post with a longer title",
@@ -43,7 +36,7 @@
 {#if galleries}
   <div class="gallery-list">
     {#each galleries as gallery}
-      <GallerySingle {gallery} />
+      <GallerySingle {gallery} on:click="" />
     {/each}
   </div>
 {/if}
